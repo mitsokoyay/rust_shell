@@ -11,8 +11,22 @@ fn main() -> io::Result<()> {
             break;
         }
         let input = line.trim();
+        if input.is_empty() {
+            continue;
+        }
         let mut splitinput = input.split_whitespace();
-        splitinput.next();
+        let Some(cmd) = splitinput.next() else {
+            continue;
+        };
+        match Command::new(cmd).args(splitinput).status() {
+            Ok(_status) => {}
+            Err(e) if e.kind() == io::ErrorKind::NotFound => {
+                eprintln!("sillyshell: command not found: {cmd}");
+            }
+            Err(e) => {
+                eprintln!("sillyshell: {cmd}: {e}");
+            }
+        }
     }
     Ok(())
 }
