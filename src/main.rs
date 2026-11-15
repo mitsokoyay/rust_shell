@@ -18,6 +18,13 @@ fn main() -> io::Result<()> {
         let Some(cmd) = splitinput.next() else {
             continue;
         };
+        if cmd == "cd" {
+            let target = splitinput.next().unwrap_or("/");
+            if let Err(e) = std::env::set_current_dir(target) {
+                eprintln!("sillyshell: cd: {target}: {e}");
+            }
+            continue;
+        }
         match Command::new(cmd).args(splitinput).status() {
             Ok(_status) => {}
             Err(e) if e.kind() == io::ErrorKind::NotFound => {
